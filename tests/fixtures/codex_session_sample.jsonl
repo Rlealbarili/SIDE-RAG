@@ -1,0 +1,3 @@
+{"type":"user_prompt","role":"user","timestamp":"2026-04-13T12:00:00Z","content":"Qual foi a decisao sobre CAPTCHA no SIGEF?"}
+{"type":"agent_answer","role":"assistant","timestamp":"2026-04-13T12:00:03Z","content":"A decisao foi manter checkpoint e retomar quando o estado awaiting_captcha aparecer."}
+{"type":"agent_tool_call","role":"assistant","timestamp":"2026-04-13T12:00:05Z","content":"Arquivo impactado: extension_chrome/content.js"}

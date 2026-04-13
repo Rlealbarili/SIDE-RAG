@@ -1,0 +1,22 @@
+[
+  {
+    "id": "q001",
+    "query": "Qual foi a decisao sobre CAPTCHA no SIGEF e estado awaiting_captcha?",
+    "expected_terms": ["CAPTCHA", "awaiting_captcha", "checkpoint", "retomar"],
+    "expected_files": [],
+    "expected_chunk_ids": [],
+    "project": "sample_project",
+    "required": true,
+    "source_hint": "Fixture temporario; valida a decisao principal antes da carga real."
+  },
+  {
+    "id": "q002",
+    "query": "Qual arquivo foi impactado pelo checkpoint do CAPTCHA?",
+    "expected_terms": ["Arquivo impactado", "checkpoint"],
+    "expected_files": ["extension_chrome/content.js"],
+    "expected_chunk_ids": [],
+    "project": "sample_project",
+    "required": false,
+    "source_hint": "Placeholder inicial para validar a pipeline."
+  }
+]
