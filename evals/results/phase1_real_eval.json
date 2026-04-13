@@ -1,0 +1,52 @@
+{
+  "queries": 4,
+  "hit_rate_at_k": 1.0,
+  "mrr": 1.0,
+  "latency_ms_avg": 2.234,
+  "details": [
+    {
+      "id": "r001",
+      "required": true,
+      "project": "side_rag",
+      "hit": true,
+      "rr": 1.0,
+      "latency_ms": 5.056,
+      "matched_terms": true,
+      "matched_files": true,
+      "matched_chunk_ids": true
+    },
+    {
+      "id": "r002",
+      "required": true,
+      "project": "side_rag",
+      "hit": true,
+      "rr": 1.0,
+      "latency_ms": 1.431,
+      "matched_terms": true,
+      "matched_files": true,
+      "matched_chunk_ids": true
+    },
+    {
+      "id": "r003",
+      "required": true,
+      "project": "side_rag",
+      "hit": true,
+      "rr": 1.0,
+      "latency_ms": 1.24,
+      "matched_terms": true,
+      "matched_files": true,
+      "matched_chunk_ids": true
+    },
+    {
+      "id": "r004",
+      "required": false,
+      "project": "side_rag",
+      "hit": true,
+      "rr": 1.0,
+      "latency_ms": 1.209,
+      "matched_terms": true,
+      "matched_files": true,
+      "matched_chunk_ids": true
+    }
+  ]
+}

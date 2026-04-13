@@ -64,16 +64,17 @@ def upsert_chunk(conn: sqlite3.Connection, chunk: dict) -> None:
 def ingest_jsonl(
     conn: sqlite3.Connection,
     input_path: Path,
-    project_id: str,
+    project_id: str | None,
     explicit_session_id: str | None = None,
     dry_run: bool = False,
 ) -> dict:
     chunks = extract_chunks(input_path, project_id=project_id, explicit_session_id=explicit_session_id)
+    resolved_project_id = chunks[0].project_id if chunks else (project_id or "unknown")
     if dry_run:
         return {
             "mode": "dry-run",
             "input": str(input_path),
-            "project_id": project_id,
+            "project_id": resolved_project_id,
             "chunks_parsed": len(chunks),
         }
 
@@ -84,6 +85,6 @@ def ingest_jsonl(
     return {
         "mode": "write",
         "input": str(input_path),
-        "project_id": project_id,
+        "project_id": resolved_project_id,
         "chunks_written": len(chunks),
     }

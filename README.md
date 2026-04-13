@@ -7,15 +7,17 @@ retrieval later.
 
 ## Status
 
-Current phase: foundation scaffold created.
+Current phase: Phase 1 implemented and in closeout.
 
 This repository now has:
 
-- project structure for Phase 1
-- Python package skeleton under `src/side_rag/`
-- CLI entry scripts for ingest, eval, inspect, and smoke search
-- docs and ADR placeholders aligned with the planning documents
-- tests and fixtures to drive the first implementation slice
+- isolated SQLite + FTS5 baseline
+- idempotent ingest for fixture and real Codex transcripts
+- real-session parser hardening for Codex rollout data
+- deterministic eval on fixture and real-session queries
+- project-id inference from transcript `cwd` metadata
+- batch ingest CLI for multiple Codex sessions
+- docs, ADRs, tests, and audit trail for Phase 1 closeout
 
 ## Principles
 
@@ -67,7 +69,6 @@ Real Codex rollout by session id:
 ```bash
 python scripts/ingest_codex_session.py \
   --codex-session-id 019d7de2-8c24-7d02-bb46-73d8f5f76aef \
-  --project side_rag_real \
   --dry-run
 ```
 
@@ -81,6 +82,21 @@ python scripts/ingest_codex_session.py \
 ```
 
 Use `--codex-session-id` for stable replay. `--latest-codex-session` is convenient, but it may point to an active transcript that is still growing.
+
+Batch ingest newest Codex rollouts with per-session project inference:
+
+```bash
+python scripts/ingest_codex_batch.py --limit 10 --dry-run
+```
+
+Batch ingest only sessions rooted under a specific workspace:
+
+```bash
+python scripts/ingest_codex_batch.py \
+  --cwd-prefix /home/vostok/SIDE-RAG \
+  --limit 5 \
+  --dry-run
+```
 
 Smoke search:
 
@@ -118,6 +134,12 @@ rm -rf data/chroma
 
 This does not touch `claude-mem`.
 
+## Phase 1 Evidence
+
+- closeout summary: `docs/phase-1-closeout.md`
+- fixture benchmark results: `evals/results/phase1_fixture_eval.json`
+- real-session benchmark results: `evals/results/phase1_real_eval.json`
+
 ## Repository Layout
 
 ```text
@@ -133,7 +155,7 @@ SIDE-RAG/
 
 ## Next Implementation Slice
 
-1. Harden the Codex JSONL parser against real transcripts.
-2. Implement idempotent ingest into SQLite.
-3. Validate FTS5 retrieval against required eval queries.
-4. Only then decide whether vector search is worth enabling.
+1. Expand ingest from a single real session to multiple projects and sessions.
+2. Improve signal-vs-noise handling in tool outputs based on benchmark data.
+3. Define the Phase 2 semantic retrieval gate from measured gaps, not intuition.
+4. Only after that, expose a read-only MCP surface.

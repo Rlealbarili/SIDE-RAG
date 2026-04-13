@@ -15,6 +15,7 @@ data/*.db-shm
 data/*.db-wal
 data/chroma/
 evals/results/*.json
+!evals/results/phase1_*.json
 
 .env
 .envrc

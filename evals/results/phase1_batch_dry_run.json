@@ -1,0 +1,39 @@
+{
+  "mode": "dry-run",
+  "requested_limit": 10,
+  "cwd_prefix": "/home/vostok/SIDE-RAG",
+  "sessions_selected": 5,
+  "processed": [
+    {
+      "mode": "dry-run",
+      "input": "/home/vostok/.codex/sessions/2026/04/11/rollout-2026-04-11T15-51-32-019d7de2-8c24-7d02-bb46-73d8f5f76aef.jsonl",
+      "project_id": "side_rag",
+      "chunks_parsed": 1045
+    },
+    {
+      "mode": "dry-run",
+      "input": "/home/vostok/.codex/sessions/2026/04/10/rollout-2026-04-10T17-13-39-019d7907-5f29-73e1-9bba-7f43d49b1008.jsonl",
+      "project_id": "side_rag",
+      "chunks_parsed": 258
+    },
+    {
+      "mode": "dry-run",
+      "input": "/home/vostok/.codex/sessions/2026/04/10/rollout-2026-04-10T18-17-20-019d7941-adc9-7d90-b11a-55ee437c04cb.jsonl",
+      "project_id": "side_rag",
+      "chunks_parsed": 1
+    },
+    {
+      "mode": "dry-run",
+      "input": "/home/vostok/.codex/sessions/2026/04/10/rollout-2026-04-10T18-08-33-019d7939-a33b-7422-9ed8-b6efc5dfe887.jsonl",
+      "project_id": "side_rag",
+      "chunks_parsed": 11
+    },
+    {
+      "mode": "dry-run",
+      "input": "/home/vostok/.codex/sessions/2026/04/10/rollout-2026-04-10T17-24-41-019d7911-7901-7d21-91fc-e17455fc6ed3.jsonl",
+      "project_id": "side_rag",
+      "chunks_parsed": 1
+    }
+  ],
+  "skipped": []
+}

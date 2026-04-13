@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from side_rag.parsers.codex_parser import extract_chunks, resolve_codex_session_file
 
 
@@ -61,6 +63,83 @@ def test_extract_chunks_reads_realistic_codex_rollout_fixture() -> None:
         "patch_apply_end",
         "mcp_tool_call_end",
     }
+
+
+def test_extract_chunks_infers_project_id_from_session_cwd(tmp_path: Path) -> None:
+    repo_root = tmp_path / "SIDE-RAG"
+    repo_root.mkdir()
+    (repo_root / ".git").mkdir()
+    fixture = tmp_path / "rollout.jsonl"
+    fixture.write_text(
+        "\n".join(
+            [
+                json_line({"type": "session_meta", "payload": {"id": "sess-1", "cwd": str(repo_root)}}),
+                json_line(
+                    {
+                        "timestamp": "2026-04-13T18:00:01Z",
+                        "type": "event_msg",
+                        "payload": {"type": "user_message", "message": "hello", "cwd": str(repo_root)},
+                    }
+                ),
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    chunks = extract_chunks(fixture, project_id=None)
+
+    assert len(chunks) == 1
+    assert chunks[0].project_id == "side_rag"
+
+
+def test_extract_chunks_requires_explicit_project_when_cwd_is_generic(tmp_path: Path) -> None:
+    fixture = tmp_path / "rollout.jsonl"
+    fixture.write_text(
+        "\n".join(
+            [
+                json_line({"type": "session_meta", "payload": {"id": "sess-1", "cwd": "/home/vostok"}}),
+                json_line(
+                    {
+                        "timestamp": "2026-04-13T18:00:01Z",
+                        "type": "event_msg",
+                        "payload": {"type": "user_message", "message": "hello", "cwd": "/home/vostok"},
+                    }
+                ),
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="Could not infer project_id"):
+        extract_chunks(fixture, project_id=None)
+
+
+def test_extract_chunks_uses_deepest_cwd_segment_when_path_no_longer_exists(tmp_path: Path) -> None:
+    missing_path = tmp_path / "openclaw" / "data" / "repos" / "Saas_Analise_Fundiaria"
+    fixture = tmp_path / "missing-project.jsonl"
+    fixture.write_text(
+        "\n".join(
+            [
+                json_line({"type": "session_meta", "payload": {"id": "sess-1", "cwd": str(missing_path)}}),
+                json_line(
+                    {
+                        "timestamp": "2026-04-13T18:00:01Z",
+                        "type": "event_msg",
+                        "payload": {"type": "user_message", "message": "hello", "cwd": str(missing_path)},
+                    }
+                ),
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    chunks = extract_chunks(fixture, project_id=None)
+
+    assert len(chunks) == 1
+    assert chunks[0].project_id == "saas_analise_fundiaria"
 
 
 def test_extract_chunks_sanitizes_exec_command_output(tmp_path: Path) -> None:
@@ -125,3 +204,9 @@ def test_resolve_codex_session_file_finds_unique_match(tmp_path: Path) -> None:
     resolved = resolve_codex_session_file(session_id="abc123", root=sessions_root)
 
     assert resolved == target
+
+
+def json_line(payload: dict) -> str:
+    import json
+
+    return json.dumps(payload, ensure_ascii=False)

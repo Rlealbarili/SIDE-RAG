@@ -25,7 +25,11 @@ def main() -> None:
         action="store_true",
         help="Resolve the latest rollout under SIDE_RAG_CODEX_SESSIONS_DIR.",
     )
-    parser.add_argument("--project", required=True, help="Logical project id.")
+    parser.add_argument(
+        "--project",
+        default="auto",
+        help="Logical project id. Use 'auto' (default) to infer from transcript cwd metadata.",
+    )
     parser.add_argument("--session-id", default=None, help="Optional explicit session id override.")
     parser.add_argument("--dry-run", action="store_true", help="Parse without writing to SQLite.")
     args = parser.parse_args()

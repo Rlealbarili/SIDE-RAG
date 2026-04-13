@@ -4,6 +4,7 @@ import hashlib
 import json
 import logging
 import re
+from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -27,6 +28,7 @@ REASONING_TYPE_RE = re.compile(r'"type"\s*:\s*"reasoning"')
 RESPONSE_ITEM_TYPE_RE = re.compile(r'"type"\s*:\s*"response_item"')
 
 logger = logging.getLogger(__name__)
+GENERIC_PROJECT_NAMES = {"", "home", "root", "tmp", "vostok"}
 
 
 def iter_jsonl_events(path: Path) -> list[tuple[int, dict[str, Any]]]:
@@ -125,6 +127,50 @@ def _resolve_session_id(
             return payload["id"]
 
     return path.stem
+
+
+def _slugify_project_name(name: str) -> str:
+    normalized = re.sub(r"[^a-zA-Z0-9]+", "_", name.strip().lower())
+    return re.sub(r"_+", "_", normalized).strip("_")
+
+
+def _find_project_root(cwd: Path) -> Path:
+    expanded = cwd.expanduser()
+    search_root = expanded
+    for candidate in (search_root, *search_root.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return search_root
+
+
+def infer_project_id(
+    path: Path,
+    events: list[tuple[int, dict[str, Any]]],
+    explicit_project_id: str | None = None,
+) -> str:
+    if explicit_project_id and explicit_project_id.strip().lower() != "auto":
+        return explicit_project_id.strip()
+
+    candidates: list[str] = []
+    for _, event in events:
+        payload = event.get("payload") if isinstance(event.get("payload"), dict) else None
+        cwd = payload.get("cwd") if payload else None
+        if not isinstance(cwd, str) or not cwd.strip():
+            continue
+
+        project_root = _find_project_root(Path(cwd))
+        slug = _slugify_project_name(project_root.name)
+        if slug in GENERIC_PROJECT_NAMES:
+            continue
+        candidates.append(slug)
+
+    if candidates:
+        return Counter(candidates).most_common(1)[0][0]
+
+    raise ValueError(
+        "Could not infer project_id from transcript cwd metadata. "
+        "Provide --project explicitly for this transcript."
+    )
 
 
 def _sanitize_exec_output(output: str) -> str:
@@ -281,7 +327,7 @@ def _build_source_hash(session_id: str, line_no: int, chunk_index: int, content:
 
 def extract_chunks(
     path: Path,
-    project_id: str,
+    project_id: str | None,
     explicit_session_id: str | None = None,
     *,
     max_chunk_chars: int | None = None,
@@ -289,6 +335,7 @@ def extract_chunks(
 ) -> list[ChunkModel]:
     chunks: list[ChunkModel] = []
     events = iter_jsonl_events(path)
+    resolved_project_id = infer_project_id(path, events, project_id)
     session_id = _resolve_session_id(path, events, explicit_session_id)
     created_at = datetime.now(UTC).isoformat()
     chunk_limit = max_chunk_chars or settings.max_chunk_chars
@@ -309,7 +356,7 @@ def extract_chunks(
             chunks.append(
                 ChunkModel(
                     chunk_id=str(uuid4()),
-                    project_id=project_id,
+                    project_id=resolved_project_id,
                     session_id=session_id,
                     content=chunk_content,
                     source_hash=_build_source_hash(session_id, line_no, chunk_index, chunk_content),

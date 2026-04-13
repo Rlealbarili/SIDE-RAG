@@ -1,0 +1,30 @@
+{
+  "queries": 2,
+  "hit_rate_at_k": 1.0,
+  "mrr": 1.0,
+  "latency_ms_avg": 0.9155,
+  "details": [
+    {
+      "id": "q001",
+      "required": true,
+      "project": "sample_project",
+      "hit": true,
+      "rr": 1.0,
+      "latency_ms": 1.204,
+      "matched_terms": true,
+      "matched_files": true,
+      "matched_chunk_ids": true
+    },
+    {
+      "id": "q002",
+      "required": false,
+      "project": "sample_project",
+      "hit": true,
+      "rr": 1.0,
+      "latency_ms": 0.627,
+      "matched_terms": true,
+      "matched_files": true,
+      "matched_chunk_ids": true
+    }
+  ]
+}

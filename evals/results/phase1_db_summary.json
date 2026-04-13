@@ -1,0 +1,53 @@
+{
+  "db_path": "/home/vostok/SIDE-RAG/data/sidecar.db",
+  "projects": [
+    {
+      "project_id": "sample_project",
+      "total": 3
+    },
+    {
+      "project_id": "side_rag",
+      "total": 1045
+    }
+  ],
+  "event_types": [
+    {
+      "source_event_type": "exec_command_end",
+      "total": 585
+    },
+    {
+      "source_event_type": "agent_message",
+      "total": 234
+    },
+    {
+      "source_event_type": "mcp_tool_call_end",
+      "total": 121
+    },
+    {
+      "source_event_type": "patch_apply_end",
+      "total": 63
+    },
+    {
+      "source_event_type": "user_message",
+      "total": 38
+    },
+    {
+      "source_event_type": "web_search_end",
+      "total": 4
+    },
+    {
+      "source_event_type": "user_prompt",
+      "total": 1
+    },
+    {
+      "source_event_type": "agent_tool_call",
+      "total": 1
+    },
+    {
+      "source_event_type": "agent_answer",
+      "total": 1
+    }
+  ],
+  "chunk_rows": 1048,
+  "fts_rows": 1048
+}
