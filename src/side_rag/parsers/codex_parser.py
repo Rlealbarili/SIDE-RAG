@@ -24,6 +24,7 @@ IGNORED_CODEX_EVENT_TYPES = {
 CLAUDE_MEM_BLOCK_RE = re.compile(r"<claude-mem-context>.*?</claude-mem-context>", re.DOTALL | re.IGNORECASE)
 ENCRYPTED_CONTENT_RE = re.compile(r'"encrypted_content"\s*:')
 REASONING_TYPE_RE = re.compile(r'"type"\s*:\s*"reasoning"')
+RESPONSE_ITEM_TYPE_RE = re.compile(r'"type"\s*:\s*"response_item"')
 
 logger = logging.getLogger(__name__)
 
@@ -131,9 +132,10 @@ def _sanitize_exec_output(output: str) -> str:
         return ""
 
     cleaned = CLAUDE_MEM_BLOCK_RE.sub("", output)
+    cleaned = cleaned.replace("<claude-mem-context>", "").replace("</claude-mem-context>", "")
     kept_lines: list[str] = []
     for line in cleaned.splitlines():
-        if ENCRYPTED_CONTENT_RE.search(line) or REASONING_TYPE_RE.search(line):
+        if ENCRYPTED_CONTENT_RE.search(line) or REASONING_TYPE_RE.search(line) or RESPONSE_ITEM_TYPE_RE.search(line):
             continue
         kept_lines.append(line.rstrip())
 

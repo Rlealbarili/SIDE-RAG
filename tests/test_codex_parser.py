@@ -74,6 +74,7 @@ def test_extract_chunks_sanitizes_exec_command_output(tmp_path: Path) -> None:
                     '{"type":"exec_command_end","command":["/bin/bash","-lc","cat ~/.codex/AGENTS.md"],'
                     '"cwd":"/home/vostok","exit_code":0,'
                     '"stdout":"line ok\\n<claude-mem-context>secret</claude-mem-context>\\n'
+                    '{\\"type\\":\\"response_item\\",\\"payload\\":{\\"type\\":\\"message\\",\\"role\\":\\"developer\\"}}\\n'
                     '{\\"type\\":\\"response_item\\",\\"payload\\":{\\"type\\":\\"reasoning\\",'
                     '\\"encrypted_content\\":\\"gAAAA...\\",\\"summary\\":[]}}\\nline final"}}'
                 ),
@@ -90,6 +91,7 @@ def test_extract_chunks_sanitizes_exec_command_output(tmp_path: Path) -> None:
     assert "line final" in chunks[0].content
     assert "<claude-mem-context>" not in chunks[0].content
     assert "encrypted_content" not in chunks[0].content
+    assert "response_item" not in chunks[0].content
     assert '"type":"reasoning"' not in chunks[0].content
 
 
