@@ -62,6 +62,26 @@ python scripts/ingest_codex_session.py \
   --project sample_project
 ```
 
+Real Codex rollout by session id:
+
+```bash
+python scripts/ingest_codex_session.py \
+  --codex-session-id 019d7de2-8c24-7d02-bb46-73d8f5f76aef \
+  --project side_rag_real \
+  --dry-run
+```
+
+Latest Codex rollout under `~/.codex/sessions`:
+
+```bash
+python scripts/ingest_codex_session.py \
+  --latest-codex-session \
+  --project side_rag_latest \
+  --dry-run
+```
+
+Use `--codex-session-id` for stable replay. `--latest-codex-session` is convenient, but it may point to an active transcript that is still growing.
+
 Smoke search:
 
 ```bash
