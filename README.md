@@ -94,6 +94,12 @@ Eval:
 python scripts/eval_retrieval.py --queries evals/eval_queries.json --top-k 5
 ```
 
+Real-session benchmark:
+
+```bash
+python scripts/eval_retrieval.py --queries evals/eval_queries_side_rag_real.json --top-k 5
+```
+
 The initial eval measures:
 
 - HitRate@K

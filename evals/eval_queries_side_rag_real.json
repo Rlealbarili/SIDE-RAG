@@ -1,0 +1,42 @@
+[
+  {
+    "id": "r001",
+    "query": "Como o server.txt foi adaptado para ext4 sem ZFS no host vostok?",
+    "expected_terms": ["ext4", "ZFS", "tmux", "Docker"],
+    "expected_files": ["server.txt"],
+    "expected_chunk_ids": [],
+    "project": "side_rag_real",
+    "required": true,
+    "source_hint": "Planejamento real do host antes da implantacao do SIDE-RAG."
+  },
+  {
+    "id": "r002",
+    "query": "Onde o hardening do SSH foi aplicado no host?",
+    "expected_terms": ["PasswordAuthentication no", "PermitRootLogin no", "pubkeyauthentication yes"],
+    "expected_files": ["/etc/ssh/sshd_config.d/10-vostok-hardening.conf"],
+    "expected_chunk_ids": [],
+    "project": "side_rag_real",
+    "required": true,
+    "source_hint": "Mudancas operacionais consolidadas no host vostok."
+  },
+  {
+    "id": "r003",
+    "query": "Qual backup compactado do Vostok1 foi gerado na limpeza do host?",
+    "expected_terms": ["Vostok1-20260411-161021.tar.zst", "1019M"],
+    "expected_files": ["/home/vostok/archives/Vostok1-20260411-161021.tar.zst"],
+    "expected_chunk_ids": [],
+    "project": "side_rag_real",
+    "required": true,
+    "source_hint": "Artefato concreto criado durante a limpeza pesada do host."
+  },
+  {
+    "id": "r004",
+    "query": "Qual caminho principal do Antigravity ficou padronizado?",
+    "expected_terms": ["/usr/share/antigravity/antigravity", "apt", "wrapper"],
+    "expected_files": ["/usr/share/antigravity/antigravity"],
+    "expected_chunk_ids": [],
+    "project": "side_rag_real",
+    "required": false,
+    "source_hint": "Resultado da remocao de duplicidade do Antigravity no host."
+  }
+]

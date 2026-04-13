@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -11,7 +13,7 @@ from side_rag.config import settings
 from side_rag.schema import ChunkModel
 
 CODEX_ROOT_TYPES = {"session_meta", "event_msg", "response_item", "turn_context", "compacted"}
-IGNORED_ROOT_TYPES = {"session_meta", "turn_context", "compacted"}
+IGNORED_ROOT_TYPES = {"session_meta", "response_item", "turn_context", "compacted"}
 IGNORED_CODEX_EVENT_TYPES = {
     "context_compacted",
     "task_complete",
@@ -19,6 +21,11 @@ IGNORED_CODEX_EVENT_TYPES = {
     "token_count",
     "turn_aborted",
 }
+CLAUDE_MEM_BLOCK_RE = re.compile(r"<claude-mem-context>.*?</claude-mem-context>", re.DOTALL | re.IGNORECASE)
+ENCRYPTED_CONTENT_RE = re.compile(r'"encrypted_content"\s*:')
+REASONING_TYPE_RE = re.compile(r'"type"\s*:\s*"reasoning"')
+
+logger = logging.getLogger(__name__)
 
 
 def iter_jsonl_events(path: Path) -> list[tuple[int, dict[str, Any]]]:
@@ -119,6 +126,21 @@ def _resolve_session_id(
     return path.stem
 
 
+def _sanitize_exec_output(output: str) -> str:
+    if not output:
+        return ""
+
+    cleaned = CLAUDE_MEM_BLOCK_RE.sub("", output)
+    kept_lines: list[str] = []
+    for line in cleaned.splitlines():
+        if ENCRYPTED_CONTENT_RE.search(line) or REASONING_TYPE_RE.search(line):
+            continue
+        kept_lines.append(line.rstrip())
+
+    compacted = "\n".join(kept_lines).strip()
+    return re.sub(r"\n{3,}", "\n\n", compacted)
+
+
 def _build_exec_command_content(payload: dict[str, Any]) -> str:
     command = payload.get("command")
     command_text = " ".join(str(part) for part in command) if isinstance(command, list) else _stringify(command)
@@ -129,7 +151,9 @@ def _build_exec_command_content(payload: dict[str, Any]) -> str:
         parts.append(f"cwd: {payload['cwd']}")
     if payload.get("exit_code") is not None:
         parts.append(f"exit_code: {payload['exit_code']}")
-    output = _stringify(payload.get("aggregated_output") or payload.get("stdout") or payload.get("stderr"))
+    output = _sanitize_exec_output(
+        _stringify(payload.get("aggregated_output") or payload.get("stdout") or payload.get("stderr"))
+    )
     if output:
         parts.append(output)
     return "\n\n".join(part for part in parts if part.strip())
@@ -195,9 +219,11 @@ def _normalize_codex_event(event: dict[str, Any]) -> tuple[str, str, str, str] |
             return event_type, "tool", timestamp, _build_mcp_tool_content(payload)
         if event_type == "web_search_end":
             return event_type, "tool", timestamp, _build_web_search_content(payload)
+        logger.debug("Ignoring unsupported Codex event_msg payload type: %s", event_type)
         return None
 
     if root_type in CODEX_ROOT_TYPES:
+        logger.debug("Ignoring unsupported Codex root type: %s", root_type)
         return None
 
     content = _extract_content(event).strip()

@@ -46,7 +46,7 @@ settings = Settings(
     data_dir=DATA_DIR,
     db_path=_path_from_env("SIDE_RAG_DB_PATH", DATA_DIR / "sidecar.db"),
     codex_sessions_dir=_path_from_env("SIDE_RAG_CODEX_SESSIONS_DIR", Path.home() / ".codex" / "sessions"),
-    parser_version=os.environ.get("SIDE_RAG_PARSER_VERSION", "0.1.0"),
+    parser_version=os.environ.get("SIDE_RAG_PARSER_VERSION", "0.1.1"),
     max_chunk_chars=_int_from_env("SIDE_RAG_MAX_CHUNK_CHARS", 8000),
     ignored_event_types=_csv_set_from_env(
         "SIDE_RAG_IGNORED_EVENT_TYPES",

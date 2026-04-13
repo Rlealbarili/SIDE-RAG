@@ -39,6 +39,11 @@ def main() -> None:
     if args.input:
         input_path = Path(args.input).expanduser().resolve()
     else:
+        if args.latest_codex_session:
+            print(
+                "warning: --latest-codex-session may resolve to an active rollout that is still growing.",
+                file=sys.stderr,
+            )
         input_path = resolve_codex_session_file(
             session_id=args.codex_session_id,
             latest=args.latest_codex_session,
